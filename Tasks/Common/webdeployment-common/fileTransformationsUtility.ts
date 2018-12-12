@@ -7,7 +7,7 @@ var jsonSubstitutionUtility = require('webdeployment-common/jsonvariablesubstitu
 var xmlSubstitutionUtility = require('webdeployment-common/xmlvariablesubstitutionutility.js');
 var xdtTransformationUtility = require('webdeployment-common/xdttransformationutility.js');
 
-export function fileTransformations(isFolderBasedDeployment: boolean, JSONFiles: any, xmlTransformation: boolean, xmlVariableSubstitution: boolean, folderPath: string, isMSBuildPackage: boolean) {
+export function fileTransformations(isFolderBasedDeployment: boolean, JSONFiles: any, xmlTransformation: boolean, xmlVariableSubstitution: boolean, folderPath: string, isMSBuildPackage: boolean, envName?: string) {
 
     if(xmlTransformation) {
         if(isMSBuildPackage) {
@@ -20,12 +20,31 @@ export function fileTransformations(isFolderBasedDeployment: boolean, JSONFiles:
             }
         }
         var environmentName = tl.getVariable('Release.EnvironmentName');
+        if(envName && envName.length > 0) {
+            environmentName = envName;
+        }
         if(tl.osType().match(/^Win/)) {
             var transformConfigs = ["Release.config"];
             if(environmentName && environmentName.toLowerCase() != 'release') {
                 transformConfigs.push(environmentName + ".config");
             }
             var isTransformationApplied: boolean = xdtTransformationUtility.basicXdtTransformation(folderPath, transformConfigs);
+
+            if(envName && envName.length > 0) {
+                var folders = xdtTransformationUtility.expandWildcardPattern(folderPath, '**/Config/*');
+                Object.keys(folders).forEach(function (folder) {
+                    var elem = folders[folder];
+                    if(!elem.endsWith(environmentName)){
+                        tl.rmRF(elem);
+                    }
+                });
+
+                var files = xdtTransformationUtility.expandWildcardPattern(folderPath, '**/Web.*.config');
+                Object.keys(files).forEach(function (file) {
+                    var elem = files[file];
+                    tl.rmRF(elem);
+                });
+            }
             
             if(isTransformationApplied)
             {

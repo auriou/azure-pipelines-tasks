@@ -12,6 +12,7 @@ async function run()
 	{
 		tl.setResourcePath(path.join( __dirname, 'task.json'));
 		var webSiteName: string = tl.getInput('WebSiteName', true);
+		var configDeployName: string = tl.getInput('ConfigDeployName', true);
 		var virtualApplication: string = tl.getInput('VirtualApplication', false);
 		var webDeployPkg: string = tl.getPathInput('Package', true);
 		var setParametersFile: string = tl.getPathInput('SetParametersFile', false);
@@ -23,7 +24,11 @@ async function run()
 		var JSONFiles = tl.getDelimitedInput('JSONFiles', '\n', false);
 		var xmlVariableSubstitution: boolean = tl.getBoolInput('XmlVariableSubstitution', false);		
 		var availableWebPackages = utility.findfiles(webDeployPkg);
-        var tempPackagePath = null;
+		var tempPackagePath = null;
+		
+		if(virtualApplication == 'null'){
+			virtualApplication = null;
+		}
 
 		if(availableWebPackages.length == 0)
 		{
@@ -42,7 +47,7 @@ async function run()
 
             var folderPath = await utility.generateTemporaryFolderForDeployment(isFolderBasedDeployment, webDeployPkg);
 			var isMSBuildPackage = !isFolderBasedDeployment && await utility.isMSDeployPackage(webDeployPkg);
-            fileTransformationsUtility.fileTransformations(isFolderBasedDeployment, JSONFiles, xmlTransformation, xmlVariableSubstitution, folderPath, isMSBuildPackage);
+            fileTransformationsUtility.fileTransformations(isFolderBasedDeployment, JSONFiles, xmlTransformation, xmlVariableSubstitution, folderPath, isMSBuildPackage, configDeployName);
             var output = await utility.archiveFolderForDeployment(isFolderBasedDeployment, folderPath);
             tempPackagePath = output.tempPackagePath;
             webDeployPkg = output.webDeployPkg;

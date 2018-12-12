@@ -1,6 +1,6 @@
 {
-  "id": "1B467810-6725-4B6D-ACCD-886174C09BBA",
-  "name": "IISWebAppDeploymentOnMachineGroup",
+  "id": "D3259D82-4DE0-413B-978B-C587493A1928",
+  "name": "SRPIISWebAppDeploymentOnMachineGroup",
   "friendlyName": "ms-resource:loc.friendlyName",
   "description": "ms-resource:loc.description",
   "helpMarkDown": "ms-resource:loc.helpMarkDown",
@@ -15,7 +15,7 @@
   "version": {
     "Major": 0,
     "Minor": 0,
-    "Patch": 48
+    "Patch": 52
   },
   "demands": [],
   "minimumAgentVersion": "2.104.1",
@@ -33,6 +33,13 @@
   ],
   "inputs": [
     {
+      "name": "ConfigDeployName",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.ConfigDeployName",
+      "defaultValue": "",
+      "required": true
+    },
+    {
       "name": "WebSiteName",
       "type": "string",
       "label": "ms-resource:loc.input.label.WebSiteName",
@@ -44,7 +51,7 @@
       "name": "VirtualApplication",
       "type": "string",
       "label": "ms-resource:loc.input.label.VirtualApplication",
-      "defaultValue": "",
+      "defaultValue": "null",
       "required": false,
       "helpMarkDown": "ms-resource:loc.input.help.VirtualApplication"
     },

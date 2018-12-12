@@ -1,10 +1,11 @@
 {
-  "loc.friendlyName": "IIS Web App Deploy",
+  "loc.friendlyName": "SRP IIS Web App Deploy",
   "loc.helpMarkDown": "[More information](https://go.microsoft.com/fwlink/?linkid=866789)",
   "loc.description": "Deploy a website or web application using Web Deploy",
   "loc.instanceNameFormat": "Deploy IIS Website/App: $(WebDeployPackage)",
   "loc.group.displayName.FileTransformsAndVariableSubstitution": "File Transforms & Variable Substitution Options",
   "loc.group.displayName.advanceDeploymentOptions": "Advanced Deployment Options",
+  "loc.input.label.ConfigDeployName": "deploy name : Develop / Preprod / Recette /Pro",
   "loc.input.label.WebSiteName": "Website Name",
   "loc.input.help.WebSiteName": "Provide the name of an existing website on the machine group machines",
   "loc.input.label.VirtualApplication": "Virtual Application",
