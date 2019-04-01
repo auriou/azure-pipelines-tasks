@@ -29,6 +29,11 @@
             "name": "advanceDeploymentOptions",
             "displayName": "Advanced Deployment Options",
             "isExpanded": true
+        },
+        {
+            "name": "fileOptions",
+            "displayName": "File or folder deleted or added",
+            "isExpanded": false
         }
     ],
     "inputs": [
@@ -134,6 +139,24 @@
             "defaultValue": "",
             "groupName": "FileTransformsAndVariableSubstitution",
             "helpMarkDown": "Provide new line separated list of JSON files to substitute the variable values. Files names are to be provided relative to the root folder. <br/> To substitute JSON variables that are nested or hierarchical, specify them using JSONPath expressions. <br/> <br/> For example, to replace the value of ‘ConnectionString’ in the sample below, you need to define a variable as ‘Data.DefaultConnection.ConnectionString’ in the build or release pipeline (or release pipeline's stage). <br/> {<br/>&nbsp;&nbsp;\"Data\": {<br/>&nbsp;&nbsp;&nbsp;&nbsp;\"DefaultConnection\": {<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\"ConnectionString\": \"Server=(localdb)\\SQLEXPRESS;Database=MyDB;Trusted_Connection=True\"<br/>&nbsp;&nbsp;&nbsp;&nbsp;}<br/>&nbsp;&nbsp;}<br/> }<br/> Variable Substitution is run after configuration transforms. <br/><br/> Note: pipeline variables are excluded in substitution."
+        },
+        {
+            "name": "DeleteFiles",
+            "type": "multiLine",
+            "label": "File or folder deleted",
+            "required": false,
+            "defaultValue": "",
+            "groupName": "fileOptions",
+            "helpMarkDown": "Files or folder deleted  variables : {config} = Config/Develop"
+        },
+        {
+            "name": "CopyDir",
+            "type": "string",
+            "label": "Folder copy to root",
+            "required": false,
+            "defaultValue": "",
+            "groupName": "fileOptions",
+            "helpMarkDown": "Folder copy  int Config/{EnvName]}/Dir"
         }
     ],
     "instanceNameFormat": "Deploy IIS Website/App: $(WebDeployPackage)",

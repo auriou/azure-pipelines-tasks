@@ -29,6 +29,11 @@
       "name": "advanceDeploymentOptions",
       "displayName": "ms-resource:loc.group.displayName.advanceDeploymentOptions",
       "isExpanded": true
+    },
+    {
+      "name": "fileOptions",
+      "displayName": "ms-resource:loc.group.displayName.fileOptions",
+      "isExpanded": false
     }
   ],
   "inputs": [
@@ -134,6 +139,24 @@
       "defaultValue": "",
       "groupName": "FileTransformsAndVariableSubstitution",
       "helpMarkDown": "ms-resource:loc.input.help.JSONFiles"
+    },
+    {
+      "name": "DeleteFiles",
+      "type": "multiLine",
+      "label": "ms-resource:loc.input.label.DeleteFiles",
+      "required": false,
+      "defaultValue": "",
+      "groupName": "fileOptions",
+      "helpMarkDown": "ms-resource:loc.input.help.DeleteFiles"
+    },
+    {
+      "name": "CopyDir",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.CopyDir",
+      "required": false,
+      "defaultValue": "",
+      "groupName": "fileOptions",
+      "helpMarkDown": "ms-resource:loc.input.help.CopyDir"
     }
   ],
   "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
