@@ -1,6 +1,6 @@
 {
     "tasks": [
-        "IISWebAppDeploymentOnMachineGroupV0"       
+        "IISWebAppDeploymentOnMachineGroupV0"
     ],
     "taskResources": [
         "*.ps1",

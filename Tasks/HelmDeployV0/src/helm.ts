@@ -1,10 +1,10 @@
 "use strict";
 
-import tl = require('vsts-task-lib/task');
+import tl = require('azure-pipelines-task-lib/task');
 import path = require('path');
-import { AzureAksService } from 'azure-arm-rest/azure-arm-aks-service';
-import { AzureRMEndpoint } from 'azure-arm-rest/azure-arm-endpoint';
-import { AzureEndpoint, AKSCluster, AKSClusterAccessProfile} from 'azure-arm-rest/azureModels';
+import { AzureAksService } from 'azure-arm-rest-v2/azure-arm-aks-service';
+import { AzureRMEndpoint } from 'azure-arm-rest-v2/azure-arm-endpoint';
+import { AzureEndpoint, AKSCluster, AKSClusterAccessProfile} from 'azure-arm-rest-v2/azureModels';
 
 import helmcli from "./helmcli";
 import kubernetescli from "./kubernetescli"
@@ -29,11 +29,13 @@ function getClusterType(): any {
 }
 
 function isKubConfigSetupRequired(command: string): boolean {
-    return command !== "package";
+    var connectionType = tl.getInput("connectionType", true);
+    return command !== "package" && connectionType !== "None";
 }
 
 function isKubConfigLogoutRequired(command: string): boolean {
-    return command !== "package" && command !== "login";
+    var connectionType = tl.getInput("connectionType", true);
+    return command !== "package" && command !== "login" && connectionType !== "None";
 }
 
 // get kubeconfig file path
@@ -61,7 +63,8 @@ async function run() {
     var connectionType = tl.getInput("connectionType", true);
     var telemetry = {
         connectionType: connectionType,
-        command: command
+        command: command,
+        jobId: tl.getVariable('SYSTEM_JOBID')
     };
 
     console.log("##vso[telemetry.publish area=%s;feature=%s]%s",
