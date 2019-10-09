@@ -27,15 +27,15 @@ const ERROR_FILE_NAME = "error.txt";
  * @returns string 
  */
 export function getMSDeployCmdArgs(webAppPackage: string, webAppName: string, publishingProfile,
-                             removeAdditionalFilesFlag: boolean, excludeFilesFromAppDataFlag: boolean, takeAppOfflineFlag: boolean,
-                             virtualApplication: string, setParametersFile: string, additionalArguments: string, isParamFilePresentInPacakge: boolean,
-                             isFolderBasedDeployment: boolean, useWebDeploy: boolean) : string {
+    removeAdditionalFilesFlag: boolean, excludeFilesFromAppDataFlag: boolean, takeAppOfflineFlag: boolean,
+    virtualApplication: string, setParametersFile: string, additionalArguments: string, isParamFilePresentInPacakge: boolean,
+    isFolderBasedDeployment: boolean, useWebDeploy: boolean): string {
 
     var msDeployCmdArgs: string = " -verb:sync";
 
     var webApplicationDeploymentPath = (virtualApplication) ? webAppName + "/" + virtualApplication : webAppName;
-    
-    if(isFolderBasedDeployment) {
+
+    if (isFolderBasedDeployment) {
         msDeployCmdArgs += " -source:IisApp=\"'" + webAppPackage + "'\"";
         msDeployCmdArgs += " -dest:iisApp=\"'" + webApplicationDeploymentPath + "'\"";
     }
@@ -54,7 +54,7 @@ export function getMSDeployCmdArgs(webAppPackage: string, webAppName: string, pu
         } else {
             msDeployCmdArgs += " -source:package=\"'" + webAppPackage + "'\"";
 
-            if(isParamFilePresentInPacakge) {
+            if (isParamFilePresentInPacakge) {
                 msDeployCmdArgs += " -dest:auto";
             }
             else {
@@ -63,25 +63,25 @@ export function getMSDeployCmdArgs(webAppPackage: string, webAppName: string, pu
         }
     }
 
-    if(publishingProfile != null) {
+    if (publishingProfile != null) {
         msDeployCmdArgs += ",ComputerName=\"'https://" + publishingProfile.publishUrl + "/msdeploy.axd?site=" + webAppName + "'\",";
         msDeployCmdArgs += "UserName=\"'" + publishingProfile.userName + "'\",Password=\"'" + publishingProfile.userPWD + "'\",AuthType=\"'Basic'\"";
     }
-    
-    if(isParamFilePresentInPacakge) {
+
+    if (isParamFilePresentInPacakge) {
         msDeployCmdArgs += " -setParam:name=\"'IIS Web Application Name'\",value=\"'" + webApplicationDeploymentPath + "'\"";
     }
 
-    if(takeAppOfflineFlag) {
+    if (takeAppOfflineFlag) {
         msDeployCmdArgs += ' -enableRule:AppOffline';
     }
 
-    if(useWebDeploy) {
-        if(setParametersFile) {
+    if (useWebDeploy) {
+        if (setParametersFile) {
             msDeployCmdArgs += " -setParamFile=" + setParametersFile + " ";
         }
 
-        if(excludeFilesFromAppDataFlag) {
+        if (excludeFilesFromAppDataFlag) {
             msDeployCmdArgs += ' -skip:Directory=App_Data';
         }
     }
@@ -89,15 +89,13 @@ export function getMSDeployCmdArgs(webAppPackage: string, webAppName: string, pu
     additionalArguments = additionalArguments ? additionalArguments : ' ';
     msDeployCmdArgs += ' ' + additionalArguments;
 
-    if(!(removeAdditionalFilesFlag && useWebDeploy)) {
+    if (!(removeAdditionalFilesFlag && useWebDeploy)) {
         msDeployCmdArgs += " -enableRule:DoNotDeleteRule";
     }
 
-    if(publishingProfile != null)
-    {
+    if (publishingProfile != null) {
         var userAgent = tl.getVariable("AZURE_HTTP_USER_AGENT");
-        if(userAgent)
-        {
+        if (userAgent) {
             msDeployCmdArgs += ' -userAgent:' + userAgent;
         }
     }
@@ -106,11 +104,27 @@ export function getMSDeployCmdArgs(webAppPackage: string, webAppName: string, pu
     return msDeployCmdArgs;
 }
 
+/**
+ * Constructs argument for MSDeploy command
+ * @param   webAppName                      web App Name
+ * @param   virtualApplication              Virtual Application Name
+ * 
+ * @returns string 
+ */
+export function getMSDeployCmdArgsForDelete(webAppName: string, virtualApplication: string): string {
+
+    var msDeployCmdArgs: string = " -verb:delete";
+    var webApplicationDeploymentPath = (virtualApplication) ? webAppName + "/" + virtualApplication : webAppName;
+    msDeployCmdArgs += " -dest:contentPath=\"'" + webApplicationDeploymentPath + "'\"";
+
+    tl.debug('Constructed msDeploy comamnd line arguments for delete');
+    return msDeployCmdArgs;
+}
 
 export async function getWebDeployArgumentsString(webDeployArguments: WebDeployArguments, publishingProfile: any) {
     return getMSDeployCmdArgs(webDeployArguments.package.getPath(), webDeployArguments.appName, publishingProfile, webDeployArguments.removeAdditionalFilesFlag,
-    webDeployArguments.excludeFilesFromAppDataFlag, webDeployArguments.takeAppOfflineFlag, webDeployArguments.virtualApplication, 
-    webDeployArguments.setParametersFile, webDeployArguments.additionalArguments, await webDeployArguments.package.isMSBuildPackage(), webDeployArguments.package.isFolder(), webDeployArguments.useWebDeploy);
+        webDeployArguments.excludeFilesFromAppDataFlag, webDeployArguments.takeAppOfflineFlag, webDeployArguments.virtualApplication,
+        webDeployArguments.setParametersFile, webDeployArguments.additionalArguments, await webDeployArguments.package.isMSBuildPackage(), webDeployArguments.package.isFolder(), webDeployArguments.useWebDeploy);
 }
 
 /**
@@ -126,40 +140,40 @@ export async function getMSDeployFullPath() {
         msDeployFullPath = msDeployFullPath + "msdeploy.exe";
         return msDeployFullPath;
     }
-    catch(error) {
+    catch (error) {
         tl.debug(error);
-        return path.join(__dirname, "MSDeploy3.6", "msdeploy.exe"); 
+        return path.join(__dirname, "MSDeploy3.6", "msdeploy.exe");
     }
 }
 
 function getMSDeployLatestRegKey(registryKey: string): Q.Promise<string> {
     var defer = Q.defer<string>();
     var regKey = new winreg({
-      hive: winreg.HKLM,
-      key:  registryKey
+        hive: winreg.HKLM,
+        key: registryKey
     })
 
-    regKey.keys(function(err, subRegKeys) {
-        if(err) {
+    regKey.keys(function (err, subRegKeys) {
+        if (err) {
             defer.reject(tl.loc("UnabletofindthelocationofMSDeployfromregistryonmachineError", err));
         }
-        var latestKeyVersion = 0 ;
+        var latestKeyVersion = 0;
         var latestSubKey;
-        for(var index in subRegKeys) {
+        for (var index in subRegKeys) {
             var subRegKey = subRegKeys[index].key;
             var subKeyVersion = subRegKey.substr(subRegKey.lastIndexOf('\\') + 1, subRegKey.length - 1);
-            if(!isNaN(subKeyVersion)){
+            if (!isNaN(subKeyVersion)) {
                 var subKeyVersionNumber = parseFloat(subKeyVersion);
-                if(subKeyVersionNumber > latestKeyVersion) {
+                if (subKeyVersionNumber > latestKeyVersion) {
                     latestKeyVersion = subKeyVersionNumber;
                     latestSubKey = subRegKey;
                 }
             }
         }
-        if(latestKeyVersion < 3) {
+        if (latestKeyVersion < 3) {
             defer.reject(tl.loc("UnsupportedinstalledversionfoundforMSDeployversionshouldbeatleast3orabove", latestKeyVersion));
         }
-         defer.resolve(latestSubKey);
+        defer.resolve(latestSubKey);
     });
     return defer.promise;
 }
@@ -168,12 +182,12 @@ function getMSDeployInstallPath(registryKey: string): Q.Promise<string> {
     var defer = Q.defer<string>();
 
     var regKey = new winreg({
-      hive: winreg.HKLM,
-      key:  registryKey
+        hive: winreg.HKLM,
+        key: registryKey
     })
 
-    regKey.get("InstallPath", function(err,item) {
-        if(err) {
+    regKey.get("InstallPath", function (err, item) {
+        if (err) {
             defer.reject(tl.loc("UnabletofindthelocationofMSDeployfromregistryonmachineError", err));
         }
         defer.resolve(item.value);
@@ -189,24 +203,24 @@ function getMSDeployInstallPath(registryKey: string): Q.Promise<string> {
  */
 export function redirectMSDeployErrorToConsole() {
     var msDeployErrorFilePath = tl.getVariable('System.DefaultWorkingDirectory') + '\\' + ERROR_FILE_NAME;
-    
-    if(tl.exist(msDeployErrorFilePath)) {
+
+    if (tl.exist(msDeployErrorFilePath)) {
         var errorFileContent = fs.readFileSync(msDeployErrorFilePath).toString();
 
-        if(errorFileContent !== "") {
-            if(errorFileContent.indexOf("ERROR_INSUFFICIENT_ACCESS_TO_SITE_FOLDER") !== -1) {
+        if (errorFileContent !== "") {
+            if (errorFileContent.indexOf("ERROR_INSUFFICIENT_ACCESS_TO_SITE_FOLDER") !== -1) {
                 tl.warning(tl.loc("Trytodeploywebappagainwithappofflineoptionselected"));
             }
-            else if(errorFileContent.indexOf("An error was encountered when processing operation 'Delete Directory' on 'D:\\home\\site\\wwwroot\\app_data\\jobs'") !== -1) {
+            else if (errorFileContent.indexOf("An error was encountered when processing operation 'Delete Directory' on 'D:\\home\\site\\wwwroot\\app_data\\jobs'") !== -1) {
                 tl.warning(tl.loc('WebJobsInProgressIssue'));
             }
-            else if(errorFileContent.indexOf("FILE_IN_USE") !== -1) {
+            else if (errorFileContent.indexOf("FILE_IN_USE") !== -1) {
                 tl.warning(tl.loc("Trytodeploywebappagainwithrenamefileoptionselected"));
             }
-            else if(errorFileContent.indexOf("transport connection") != -1){
+            else if (errorFileContent.indexOf("transport connection") != -1) {
                 errorFileContent = errorFileContent + tl.loc("Updatemachinetoenablesecuretlsprotocol");
             }
-          
+
             tl.error(errorFileContent);
         }
 
@@ -215,23 +229,23 @@ export function redirectMSDeployErrorToConsole() {
 }
 
 export function getWebDeployErrorCode(errorMessage): string {
-    if(errorMessage !== "") {
-        if(errorMessage.indexOf("ERROR_INSUFFICIENT_ACCESS_TO_SITE_FOLDER") !== -1) {
+    if (errorMessage !== "") {
+        if (errorMessage.indexOf("ERROR_INSUFFICIENT_ACCESS_TO_SITE_FOLDER") !== -1) {
             return "ERROR_INSUFFICIENT_ACCESS_TO_SITE_FOLDER";
         }
-        else if(errorMessage.indexOf("An error was encountered when processing operation 'Delete Directory' on 'D:\\home\\site\\wwwroot\\app_data\\jobs") !== -1) {
+        else if (errorMessage.indexOf("An error was encountered when processing operation 'Delete Directory' on 'D:\\home\\site\\wwwroot\\app_data\\jobs") !== -1) {
             return "WebJobsInProgressIssue";
         }
-        else if(errorMessage.indexOf("FILE_IN_USE") !== -1) {
+        else if (errorMessage.indexOf("FILE_IN_USE") !== -1) {
             return "FILE_IN_USE";
         }
-        else if(errorMessage.indexOf("transport connection") != -1){
+        else if (errorMessage.indexOf("transport connection") != -1) {
             return "transport connection";
         }
-        else if(errorMessage.indexOf("ERROR_CONNECTION_TERMINATED") != -1) {
+        else if (errorMessage.indexOf("ERROR_CONNECTION_TERMINATED") != -1) {
             return "ERROR_CONNECTION_TERMINATED"
         }
-        else if(errorMessage.indexOf("ERROR_CERTIFICATE_VALIDATION_FAILED") != -1) {
+        else if (errorMessage.indexOf("ERROR_CERTIFICATE_VALIDATION_FAILED") != -1) {
             return "ERROR_CERTIFICATE_VALIDATION_FAILED";
         }
     }

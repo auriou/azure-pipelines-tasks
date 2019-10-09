@@ -39,6 +39,13 @@ export async function DeployUsingMSDeploy(webDeployPkg, webAppName, publishingPr
     }
     var isParamFilePresentInPackage = isFolderBasedDeployment ? false : await utility.isMSDeployPackage(webDeployPkg);
 
+    var msDeployCmdArgsDelete = msDeployUtility.getMSDeployCmdArgsForDelete(webAppName, virtualApplication);
+
+    tl.debug(msDeployCmdArgsDelete);
+    tl.warning("TEST");
+    console.log("yolo");
+    console.log(msDeployCmdArgsDelete);
+
     var msDeployCmdArgs = msDeployUtility.getMSDeployCmdArgs(webDeployPkg, webAppName, publishingProfile, removeAdditionalFilesFlag,
         excludeFilesFromAppDataFlag, takeAppOfflineFlag, virtualApplication, setParametersFileName, additionalArguments, isParamFilePresentInPackage, isFolderBasedDeployment,
         useWebDeploy);

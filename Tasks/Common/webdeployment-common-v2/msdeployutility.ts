@@ -11,6 +11,23 @@ const ERROR_FILE_NAME = "error.txt";
 
 /**
  * Constructs argument for MSDeploy command
+ * @param   webAppName                      web App Name
+ * @param   virtualApplication              Virtual Application Name
+ * 
+ * @returns string 
+ */
+export function getMSDeployCmdArgsForDelete(webAppName: string, virtualApplication: string): string {
+
+    var msDeployCmdArgs: string = " -verb:delete";
+    var webApplicationDeploymentPath = (virtualApplication) ? webAppName + "/" + virtualApplication : webAppName;
+    msDeployCmdArgs += " -dest:contentPath=\"'" + webApplicationDeploymentPath + "'\"";
+
+    tl.debug('Constructed msDeploy comamnd line arguments for delete');
+    return msDeployCmdArgs;
+}
+
+/**
+ * Constructs argument for MSDeploy command
  * 
  * @param   webAppPackage                   Web deploy package
  * @param   webAppName                      web App Name

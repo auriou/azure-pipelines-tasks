@@ -10,6 +10,8 @@ async function run()
 {
 	try
 	{
+		const test = "test";
+		//tl.msDeploy
 		tl.setResourcePath(path.join( __dirname, 'task.json'));
 		tl.setResourcePath(path.join( __dirname, 'node_modules/webdeployment-common-v2/module.json'));
 		var webSiteName: string = tl.getInput('WebSiteName', true);

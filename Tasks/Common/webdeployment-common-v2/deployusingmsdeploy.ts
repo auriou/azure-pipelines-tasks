@@ -24,17 +24,23 @@ const DEFAULT_RETRY_COUNT = 3;
  *
  */
 export async function DeployUsingMSDeploy(webDeployPkg, webAppName, publishingProfile, removeAdditionalFilesFlag,
-        excludeFilesFromAppDataFlag, takeAppOfflineFlag, virtualApplication, setParametersFile, additionalArguments, isFolderBasedDeployment, useWebDeploy) {
+    excludeFilesFromAppDataFlag, takeAppOfflineFlag, virtualApplication, setParametersFile, additionalArguments, isFolderBasedDeployment, useWebDeploy) {
+
+    var msDeployCmdArgsDelete = msDeployUtility.getMSDeployCmdArgsForDelete(webAppName, virtualApplication);
+    tl.debug(msDeployCmdArgsDelete);
+    tl.warning("TEST");
+    console.log("yolo");
+    console.log(msDeployCmdArgsDelete);
 
     var msDeployPath = await msDeployUtility.getMSDeployFullPath();
     var msDeployDirectory = msDeployPath.slice(0, msDeployPath.lastIndexOf('\\') + 1);
     var pathVar = process.env.PATH;
-    process.env.PATH = msDeployDirectory + ";" + process.env.PATH ;
+    process.env.PATH = msDeployDirectory + ";" + process.env.PATH;
 
     setParametersFile = utility.copySetParamFileIfItExists(setParametersFile);
     var setParametersFileName = null;
 
-    if(setParametersFile != null) {
+    if (setParametersFile != null) {
         setParametersFileName = setParametersFile.slice(setParametersFile.lastIndexOf('\\') + 1, setParametersFile.length);
     }
     var isParamFilePresentInPackage = isFolderBasedDeployment ? false : await utility.isMSDeployPackage(webDeployPkg);
@@ -44,24 +50,24 @@ export async function DeployUsingMSDeploy(webDeployPkg, webAppName, publishingPr
         useWebDeploy);
 
     var retryCountParam = tl.getVariable("appservice.msdeployretrycount");
-    var retryCount = (retryCountParam && !(isNaN(Number(retryCountParam)))) ? Number(retryCountParam): DEFAULT_RETRY_COUNT; 
-    
+    var retryCount = (retryCountParam && !(isNaN(Number(retryCountParam)))) ? Number(retryCountParam) : DEFAULT_RETRY_COUNT;
+
     try {
-        while(true) {
+        while (true) {
             try {
                 retryCount -= 1;
-                await executeMSDeploy(msDeployCmdArgs);
+                await executeMSDeploy(msDeployCmdArgsDelete);
                 break;
             }
             catch (error) {
-                if(retryCount == 0) {
+                if (retryCount == 0) {
                     throw error;
                 }
                 console.log(error);
                 console.log(tl.loc('RetryToDeploy'));
             }
         }
-        if(publishingProfile != null) {
+        if (publishingProfile != null) {
             console.log(tl.loc('PackageDeploymentSuccess'));
         }
     }
@@ -73,7 +79,7 @@ export async function DeployUsingMSDeploy(webDeployPkg, webAppName, publishingPr
     }
     finally {
         process.env.PATH = pathVar;
-        if(setParametersFile != null) {
+        if (setParametersFile != null) {
             tl.rmRF(setParametersFile);
         }
     }
@@ -86,10 +92,10 @@ export async function executeWebDeploy(WebDeployArguments: WebDeployArguments, p
         var msDeployPath = await msDeployUtility.getMSDeployFullPath();
         var msDeployDirectory = msDeployPath.slice(0, msDeployPath.lastIndexOf('\\') + 1);
         var pathVar = process.env.PATH;
-        process.env.PATH = msDeployDirectory + ";" + process.env.PATH ;
+        process.env.PATH = msDeployDirectory + ";" + process.env.PATH;
         await executeMSDeploy(webDeployArguments);
     }
-    catch(exception) {
+    catch (exception) {
         var msDeployErrorFilePath = tl.getVariable('System.DefaultWorkingDirectory') + '\\' + 'error.txt';
         var errorFileContent = tl.exist(msDeployErrorFilePath) ? fs.readFileSync(msDeployErrorFilePath, 'utf-8') : "";
         return {
@@ -127,7 +133,7 @@ function argStringToArray(argString): string[] {
             continue;
         }
         if (c === "\\" && inQuotes) {
-            if(escaped) {
+            if (escaped) {
                 append(c);
             }
             else {
@@ -155,13 +161,13 @@ async function executeMSDeploy(msDeployCmdArgs) {
     var deferred = Q.defer();
 
     var msDeployError = null;
-    var errorFile = path.join(tl.getVariable('System.DefaultWorkingDirectory'),"error.txt");
+    var errorFile = path.join(tl.getVariable('System.DefaultWorkingDirectory'), "error.txt");
     var fd = fs.openSync(errorFile, "w");
-    var errObj = fs.createWriteStream("", {fd: fd} );
+    var errObj = fs.createWriteStream("", { fd: fd });
 
     errObj.on('finish', async () => {
-        if(msDeployError) {
-           deferred.reject(msDeployError);
+        if (msDeployError) {
+            deferred.reject(msDeployError);
         }
     });
 
@@ -171,10 +177,10 @@ async function executeMSDeploy(msDeployCmdArgs) {
         tl.debug("converting the argument string into an array of arguments");
         msDeployCmdArgs = argStringToArray(msDeployCmdArgs);
         tl.debug("the array of arguments is:");
-        for(var i = 0 ; i < msDeployCmdArgs.length ; i++ ) {
+        for (var i = 0; i < msDeployCmdArgs.length; i++) {
             tl.debug("arg#" + i + ": " + msDeployCmdArgs[i]);
         }
-        await tl.exec("msdeploy", msDeployCmdArgs, <any>{failOnStdErr: true, errStream: errObj, windowsVerbatimArguments: true});
+        await tl.exec("msdeploy", msDeployCmdArgs, <any>{ failOnStdErr: true, errStream: errObj, windowsVerbatimArguments: true });
         deferred.resolve("Azure App service successfully deployed");
     } catch (error) {
         msDeployError = error;
